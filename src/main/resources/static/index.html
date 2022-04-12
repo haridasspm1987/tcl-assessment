@@ -1,0 +1,162 @@
+<head>
+	<title>TCL Assessment Test</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script>
+		$(document).ready(function () {
+
+
+			$("#createStudents").click(function () {
+
+				var saveData = $.ajax({
+					type: 'POST',
+					contentType: "application/json",
+					url: "http://localhost:8080/student/bulkcreate",
+					data: document.getElementById("inputJson").value,
+					dataType: "json",
+					success: function (resultData) {
+						alert("Created Successfully!");
+						//alert(resultData[0].name);
+						ConvertToTable(resultData);
+					},
+					error: function (resultData) {
+						alert("Creation Failed!")
+					}
+				});
+
+			});
+
+
+			$("#search").click(function () {
+				var filter = {
+					"min": document.getElementById("min").value,
+					"max": document.getElementById("max").value,
+					"sortBy": document.getElementById("sortBy").value,
+					"orderBy": document.getElementById("orderBy").value
+				}
+
+				var saveData = $.ajax({
+					type: 'POST',
+					contentType: "application/json",
+					url: "http://localhost:8080/student/search",
+					data: JSON.stringify(filter),
+					dataType: "json",
+					success: function (resultData) {
+						//alert("Search is Successfull!");
+						//alert(resultData[0].name);
+						ConvertToTable(resultData);
+					},
+					error: function (resultData) {
+						alert("Search Failed!")
+					}
+				});
+
+			});
+
+		});
+
+		function ConvertToTable(jData) {
+			var arrJSON = typeof jData != 'object' ? JSON.parse(jData) : jData;
+			var $table = $('<table border="1" >');
+			var $headerTr = $('<tr/>');
+
+			for (var index in arrJSON[0]) {
+				$headerTr.append($('<th/>').html(index));
+			}
+			$table.append($headerTr);
+			for (var i = 0; i < arrJSON.length; i++) {
+				var $tableTr = $('<tr/>');
+				for (var index in arrJSON[i]) {
+					$tableTr.append($('<td/>').html(arrJSON[i][index]));
+				}
+				$table.append($tableTr);
+			}
+			$table.append('</table>')
+			$('#studentTableDiv').html($table);
+		}
+
+
+	</script>
+</head>
+
+<body>
+
+	<div style="border: thin solid black" align="left">
+		<b>Create Bulk Students </b>
+
+		<br /><br />
+		JSON input: </br>
+		&nbsp;
+		<textarea id="inputJson" rows="10" cols="70" align="left">
+			[
+			{
+			"name": "Person 1",
+			"marks": 79
+			},
+			{
+			"name": "Person 2",
+			"marks": 49
+			},
+			{
+			"name": "Person 3",
+			"marks": 60
+			},
+			{
+			"name": "Person 4",
+			"marks": 55
+			}
+			]
+		</textarea>
+		<div id="createErrorMessage"> </div>
+		</br /></br />
+		&nbsp;&nbsp;<input type="button" value="Create" id="createStudents">
+		</br></br>
+	</div>
+
+
+	<br />
+	<div style=" height:400px; border: thin solid black" align="left">
+		<b>Search Students </b>
+		</br>
+		<table align="left" border='0'>
+			<tr>
+				<td>Minimm</td>
+				<td><input type="text" id="min" name="min" "></td>
+			</tr>
+			<tr>
+				<td>Maximum</td>
+				<td><input type=" text" id="max" name="max"></td>
+			</tr>
+			<tr>
+				<td>Sort By</td>
+				<td><select name="sortBy" id="sortBy">
+						<option value="name">Name</option>
+						<option value="marks">Marks</option>
+					</select></td>
+			</tr>
+			<tr>
+				<td>Order By</td>
+				<td><select name="orderBy" id="orderBy">
+						<option value="ASCENDING">Ascending</option>
+						<option value="DESCENDING">Descending</option>
+					</select></td>
+			</tr>
+			<tr />
+			<tr />
+			<tr>
+				<td></td>
+				<td><input type="button" value="Search" id="search" /></td>
+			</tr>
+
+			<tr>
+				<td></td>
+				<td>
+					<div id="studentTableDiv"></div>
+				</td>
+			</tr>
+		</table>
+		</br>
+
+
+	</div>
+
+</body>
